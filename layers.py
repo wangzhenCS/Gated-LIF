@@ -25,7 +25,7 @@ class SpikeAct_extended(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, grad_output):
-        input = ctx.saved_tensors
+        input, = ctx.saved_tensors
         grad_input = grad_output.clone()
 
         # hu is an approximate func of df/du in linear formulation
