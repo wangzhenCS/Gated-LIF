@@ -234,9 +234,9 @@ def main():
     
     #model = ResNet_18_stand_CW(lif_param=initial_dict, input_size=32, n_class=10)
            
-    #model = ResNet_18_stand(lif_param=initial_dict, input_size=32, n_class=10)
+    model = ResNet_18_stand(lif_param=initial_dict, input_size=32, n_class=10)
         
-    model = CIFARNet(lif_param=initial_dict, input_size=32, n_class=10)
+    #model = CIFARNet(lif_param=initial_dict, input_size=32, n_class=10)
         
 
     if args.randomgate:
