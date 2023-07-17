@@ -231,49 +231,13 @@ def main():
 
     print(initial_dict)
     #prepare the model
-    if args.imagenet:
-        if args.MS18:
-            model = ResNet_18_stand_CW_MS(lif_param=initial_dict, input_size=224, n_class=1000)
-        elif args.MS34:
-            model = ResNet_34_stand_CW_MS(lif_param=initial_dict, input_size=224, n_class=1000)
-        elif args.channel_wise:
-            model = ResNet_34_stand_CW(lif_param=initial_dict, input_size=224, n_class=1000)
-        else:
-            model = ResNet_34_stand(lif_param=initial_dict, input_size=224, n_class=1000)
-    elif args.cifar100:
-        if args.cifarnet:
-            model = CIFARNet(lif_param=initial_dict, input_size=32, n_class=100)
-        elif args.stand18:
-            if args.channel_wise:
-                if args.softsimple:
-                    model =ResNet_18_stand_CW_softsimple(lif_param=initial_dict, input_size=32, n_class=100)
-                else:
-                    model = ResNet_18_stand_CW(lif_param=initial_dict, input_size=32, n_class=100)
-            else:
-                model = ResNet_18_stand(lif_param=initial_dict, input_size=32, n_class=100)
-        else:
-            if args.channel_wise: #resnet -19
-                if args.softsimple:
-                    model =ResNet_19_stand_CW_softsimple(lif_param=initial_dict, input_size=32, n_class=100)
-                else:
-                    model = ResNet_19_cifar_CW(lif_param=initial_dict, input_size=32, n_class=100)
-            else:
-                model = ResNet_19_cifar(lif_param=initial_dict, input_size=32, n_class=100)
-    else: #cifar10
-        if args.stand18:
-            if args.channel_wise:
-                if args.softsimple:
-                    model =ResNet_18_stand_CW_softsimple(lif_param=initial_dict, input_size=32, n_class=10)
-                else:
-                    model = ResNet_18_stand_CW(lif_param=initial_dict, input_size=32, n_class=10)
-            else:
-                model = ResNet_18_stand(lif_param=initial_dict, input_size=32, n_class=10)
-        elif args.cifarnet:
-            model = CIFARNet(lif_param=initial_dict, input_size=32, n_class=10)
-        elif args.channel_wise: # resnet-19
-            model = ResNet_19_cifar_CW(lif_param=initial_dict, input_size=32, n_class=10)
-        else:
-            model = ResNet_19_cifar(lif_param=initial_dict, input_size=32, n_class=10)
+    
+    #model = ResNet_18_stand_CW(lif_param=initial_dict, input_size=32, n_class=10)
+           
+    #model = ResNet_18_stand(lif_param=initial_dict, input_size=32, n_class=10)
+        
+    model = CIFARNet(lif_param=initial_dict, input_size=32, n_class=10)
+        
 
     if args.randomgate:
         randomize_gate(model)
