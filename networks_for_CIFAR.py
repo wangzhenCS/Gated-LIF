@@ -7,7 +7,7 @@ init_constrain = 0.2
 
 # for CIFAR
 class CIFARNet(nn.Module):
-    def __init__(self, lif_param: dict, input_size=32, n_class=100, tunable_lif=False):
+    def __init__(self, lif_param: dict, input_size=32, n_class=10, tunable_lif=False):
         super(CIFARNet, self).__init__()
         assert input_size % 32 == 0
         self.choice_param_name = ['alpha', 'beta', 'gamma']
@@ -53,7 +53,7 @@ class CIFARNet(nn.Module):
 
     def make_layer(self, cfg, batch_norm=True):
         layers = []
-        in_channels = 3
+        in_channels = 1
         for v in cfg:
             if v == "A":
                 layers += [layer.SeqToANNContainer(nn.AvgPool2d(kernel_size=2, stride=2))]
@@ -94,7 +94,7 @@ class CIFARNet(nn.Module):
 
 
 class ResNet_18_stand(nn.Module):
-    def __init__(self, lif_param:dict,input_size=32, n_class=100, tunable_lif=False):
+    def __init__(self, lif_param:dict,input_size=32, n_class=10, tunable_lif=False):
         super(ResNet_18_stand, self).__init__()
         assert input_size % 32 == 0
 
@@ -112,7 +112,7 @@ class ResNet_18_stand(nn.Module):
         # building first layer
         input_channel = self.stage_out_channels[1]
         self.conv1 = nn.Sequential(
-            layer.SeqToANNContainer(nn.Conv2d(3, input_channel, kernel_size=3, stride=1, padding=1, bias=False),
+            layer.SeqToANNContainer(nn.Conv2d(1, input_channel, kernel_size=3, stride=1, padding=1, bias=False),
                                     tdBatchNorm(input_channel),
                                     ),
 
@@ -201,7 +201,7 @@ class ResNet_18_stand(nn.Module):
 
 
 class ResNet_18_stand_CW(nn.Module):
-    def __init__(self, lif_param:dict, input_size=32, n_class=100, tunable_lif=False):
+    def __init__(self, lif_param:dict, input_size=32, n_class=10, tunable_lif=False):
         super(ResNet_18_stand_CW, self).__init__()
         assert input_size % 32 == 0
 
@@ -217,7 +217,7 @@ class ResNet_18_stand_CW(nn.Module):
         # building first layer
         input_channel = self.stage_out_channels[1]
         self.conv1 = nn.Sequential(
-            layer.SeqToANNContainer(nn.Conv2d(3, input_channel, kernel_size=3, stride=1, padding=1, bias=False),
+            layer.SeqToANNContainer(nn.Conv2d(1, input_channel, kernel_size=3, stride=1, padding=1, bias=False),
                                     tdBatchNorm(input_channel),
                                     ),
 
