@@ -28,9 +28,9 @@ def get_args():
     parser.add_argument('--eval', default=False, action='store_true')
     parser.add_argument('--eval-resume', type=str, default='./raw/models', help='path for eval model')
     parser.add_argument('--train-resume', type=str, default='./raw/models', help='path for train model')
-    parser.add_argument('--batch-size', type=int, default=72, help='batch size')
-    parser.add_argument('--epochs', type=int, default=200, help='total epochs used in training SuperNet')
-    parser.add_argument('--learning-rate', type=float, default=1e-1, help='init learning rate')
+    parser.add_argument('--batch-size', type=int, default=40, help='batch size')
+    parser.add_argument('--epochs', type=int, default=50, help='total epochs used in training SuperNet')
+    parser.add_argument('--learning-rate', type=float, default=1e-3, help='init learning rate')
     parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
     parser.add_argument('--weight-decay', type=float, default=4e-5, help='weight decay')
     parser.add_argument('--seed', type=int, default=9, metavar='S', help='random seed (default: 9)')
@@ -366,16 +366,17 @@ def main():
     while (epochs <= args.epochs):
         train(args, model, device, train_loader, optimizer, epochs, writer, criterion=loss_function,
               scaler=scaler)
-        if epochs % 1 == 0:
+        if epochs % 5 == 0:
             test(args, model, device, val_loader, epochs, writer, criterion=loss_function,
                  modeltag=modeltag, best=best, dict_params=dict_params)
+            torch.save(model, '/kaggle/working/model-'+str(epochs)+'.pt')
         else:
             pass
         print('and lr now is {}'.format(scheduler.get_last_lr()))
         scheduler.step()
         epochs += 1
     writer.close()
-
+    torch.save(model, '/kaggle/working/model-last.pt')
 
 
 if __name__ == "__main__":
