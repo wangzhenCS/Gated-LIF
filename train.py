@@ -12,6 +12,10 @@ from tensorboardX import SummaryWriter
 from torch.cuda import amp
 from schedulers import *
 from Regularization import *
+import torchvision.transforms as transforms
+from torchvision.datasets import ImageFolder
+from torch.utils.data import DataLoader
+from torch.utils.data import SubsetRandomSampler
 import random
 
 ####################################################
@@ -182,18 +186,6 @@ def main():
         torch.distributed.init_process_group(backend="nccl")
         torch.cuda.set_device(local_rank)
 
-    # Log
-    log_format = '[%(asctime)s] %(message)s'
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO,
-        format=log_format, datefmt='%d %I:%M:%S')
-    t = time.time()
-    local_time = time.localtime(t)
-    if not os.path.exists('./log'):
-        os.mkdir('./log')
-    fh = logging.FileHandler(os.path.join('log/train-{}{:02}{}'.format(local_time.tm_year % 2000, local_time.tm_mon, t)))
-    fh.setFormatter(logging.Formatter(log_format))
-    logging.getLogger().addHandler(fh)
-
     epochs = 1#已经迭代的次数
     initial_dict = {'gate': [0.6, 0.8, 0.6], 'param': [tau, Vth, linear_decay, conduct],
                    't': steps, 'static_gate': True, 'static_param': False, 'time_wise': True, 'soft_mode': False}
@@ -212,17 +204,29 @@ def main():
     use_gpu = False
     if torch.cuda.is_available():
         use_gpu = True
-    if args.imagenet:
-        train_loader, val_loader, _ = build_data(use_cifar10=False, dataset='imagenet',
-                                                 batch_size=args.batch_size, train_val_split=False, workers=32,
-                                                 imagenet_train_dir=args.train_dir, imagenet_val_dir=args.val_dir)
-    elif args.cifar100:
-        train_loader, val_loader, _ = build_data(use_cifar10=False, dataset='CIFAR100', dpath=args.dataset_path,
-                                                 batch_size=args.batch_size, train_val_split=False, workers=16)
-    else:
-        #use cifar10
-        train_loader, val_loader, _ = build_data(use_cifar10=True, dpath=args.dataset_path,
-                                              batch_size=args.batch_size, train_val_split=False, workers=16)
+    #---------------------------------------------------------------------------
+    # 加载实验数据集
+    transform = transforms.Compose(
+        [transforms.Grayscale(),# 转成单通道的灰度图
+         # 把值转成Tensor
+        transforms.ToTensor()])
+
+    dataset = ImageFolder("/kaggle/input/ddos-2019/Dataset-4/Dataset-4", 
+                      transform=transform)
+
+    # 切分，训练集和验证集
+    random.seed(0)
+    indices = list(range(len(dataset)))
+    random.shuffle(indices)
+    split_point = int(0.8*len(indices))
+    train_indices = indices[:split_point]
+    test_indices = indices[split_point:]
+
+    train_loader = DataLoader(dataset, batch_size=40,
+                          sampler=SubsetRandomSampler(train_indices))
+    val_loader = DataLoader(dataset, batch_size=40,
+                         sampler=SubsetRandomSampler(test_indices))
+    #---------------------------------------------------------------------------
     print('load data successfully')
 
     print(initial_dict)
