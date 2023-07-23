@@ -17,6 +17,7 @@ from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
 from torch.utils.data import SubsetRandomSampler
 import random
+import torch.nn
 
 ####################################################
 # args                                             #
@@ -216,17 +217,15 @@ def main():
     params_id = list(map(id, lif_params))
     other_params = list(filter(lambda p: id(p) not in params_id, all_params))
     # optimizer & scheduler
-    optimizer = torch.optim.SGD([
-        {'params': other_params},
-        {'params': lif_params, "weight_decay": 0.}
-        ],
-        lr=args.learning_rate,
-        momentum=0.9,
-        weight_decay=args.weight_decay
-    )
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=50)
+    optimizer = torch.optim.SGD(model.parameters(),
+                lr=0.001,
+                momentum=0.9,
+                weight_decay=0.0005
+            )
+    scheduler = CosineAnnealingLR_Multi_Params_soft(optimizer,
+                                                T_max=[50, 50, 50])
+    criterion = nn.CrossEntropyLoss()
 
-    criterion = Loss(args)
     device = torch.device("cuda" if use_gpu else "cpu")
     
     #Distributed computation
