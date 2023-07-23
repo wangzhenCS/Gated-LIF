@@ -18,6 +18,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data import SubsetRandomSampler
 import random
 import torch.nn as nn
+import torch
 
 ####################################################
 # args                                             #
@@ -220,8 +221,8 @@ def main():
                 momentum=0.9,
                 weight_decay=0.0005
             )
-    scheduler = CosineAnnealingLR_Multi_Params_soft(optimizer,
-                                                T_max=50)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, 
+                    T_max=50) 
     criterion = nn.CrossEntropyLoss()
 
     device = torch.device("cuda" if use_gpu else "cpu")
