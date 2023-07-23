@@ -224,7 +224,7 @@ def main():
         momentum=0.9,
         weight_decay=args.weight_decay
     )
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=50)
 
     criterion = Loss(args)
     device = torch.device("cuda" if use_gpu else "cpu")
