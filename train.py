@@ -103,19 +103,10 @@ def test(args, model, device, test_loader, epoch, writer, criterion, modeltag, d
         correct = 0
         for batch_idx, (inputs, targets) in enumerate(test_loader):
             inputs = inputs.cuda()
+            targets = targets.cuda()
             outputs = model(inputs)
         
-            #print(outputs)
-            #print(targets)
-        
-            # 组织预测获得的值
-            #pre[batch_idx*batch_size:(batch_idx+1)*batch_size] = outputs[:, :]
-        
-            labels = torch.zeros(batch_size, num_classes).scatter_(1, targets.view(-1, 1), 1)
-            # 组织真实标签值
-            #y_test[batch_idx*batch_size:(batch_idx+1)*batch_size] = labels[:, :]
-        
-            _, predicted = outputs.cpu().max(1)
+            _, predicted = outputs.cuda().max(1)
         
             total += float(targets.size(0))
             correct += float(predicted.eq(targets).sum().item())
