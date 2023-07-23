@@ -103,7 +103,7 @@ def test(args, model, device, test_loader, epoch, writer, criterion, modeltag, d
         correct = 0
         for batch_idx, (inputs, targets) in enumerate(test_loader):
             inputs = inputs.cuda()
-            outputs = F.softmax(model(inputs))
+            outputs = model(inputs)
         
             #print(outputs)
             #print(targets)
