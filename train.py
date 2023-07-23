@@ -216,35 +216,19 @@ def main():
     params_id = list(map(id, lif_params))
     other_params = list(filter(lambda p: id(p) not in params_id, all_params))
     # optimizer & scheduler
-    if args.tunable_lif:
-        init_lr_diff = 10
-        if args.imagenet:
-            init_lr_diff = 1
-
-        optimizer = torch.optim.SGD([
-                {'params': other_params},
-                {'params': lif_cal_params, "weight_decay": 0.},
-                {'params': lif_choice_params, "weight_decay": 0., "lr":args.learning_rate / init_lr_diff}
-            ],
-                lr=args.learning_rate,
-                momentum=0.9,
-                weight_decay=args.weight_decay
-            )
-        scheduler = CosineAnnealingLR_Multi_Params_soft(optimizer,
-                                                            T_max=[args.epochs, args.epochs, int(args.epochs)])
-    else:
-        optimizer = torch.optim.SGD([
-            {'params': other_params},
-            {'params': lif_params, "weight_decay": 0.}
+    optimizer = torch.optim.SGD([
+        {'params': other_params},
+        {'params': lif_params, "weight_decay": 0.}
         ],
-            lr=args.learning_rate,
-            momentum=0.9,
-            weight_decay=args.weight_decay
-        )
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
+        lr=args.learning_rate,
+        momentum=0.9,
+        weight_decay=args.weight_decay
+    )
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
 
     criterion = Loss(args)
     device = torch.device("cuda" if use_gpu else "cpu")
+    
     #Distributed computation
     if torch.cuda.is_available():
         loss_function = criterion.cuda()
@@ -268,30 +252,6 @@ def main():
 
 
     best = {'acc': 0., 'epoch': 0}
-
-    if args.eval:
-        lastest_model = get_model(modeltag, addr=args.eval_resume)
-        if lastest_model is not None:
-            epochs = -1
-            checkpoint = torch.load(lastest_model, map_location='cpu')
-            if args.imagenet:
-                model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
-                checkpoint = deletStrmodule(checkpoint)
-            model.load_state_dict(checkpoint['state_dict'], strict=True)
-            if torch.cuda.device_count() > 1:
-                device = torch.device(local_rank)
-                model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
-                model = nn.parallel.DistributedDataParallel(model.cuda(), device_ids=[local_rank],
-                                                            output_device=local_rank,
-                                                            find_unused_parameters=False)
-            else:
-                model = model.to(device)
-            test(args, model, device, val_loader, epochs, writer, criterion=loss_function,
-                 modeltag=modeltag, best=best, dict_params=dict_params)
-        else:
-            print('no model detected')
-        exit(0)
-
 
     if torch.cuda.device_count() > 1:
         device = torch.device(local_rank)
