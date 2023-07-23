@@ -111,7 +111,7 @@ def test(args, model, device, test_loader, epoch, writer, criterion, modeltag, d
             total += float(targets.size(0))
             correct += float(predicted.eq(targets).sum().item())
         
-        print('Testing acc:%.3f'%(100.*correct/total))
+        print('Testing acc:%.3f'%(100.*correct/total), flush=True)
 
         
 
