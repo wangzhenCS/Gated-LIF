@@ -102,11 +102,11 @@ def test(args, model, device, test_loader, epoch, writer, criterion, modeltag, d
         total = 0
         correct = 0
         for batch_idx, (inputs, targets) in enumerate(test_loader):
-            inputs = inputs.cuda()
-            targets = targets.cuda()
+            inputs = inputs.to(device)
+            targets = targets.to(device)
             outputs = model(inputs)
         
-            _, predicted = outputs.cuda().max(1)
+            _, predicted = outputs.to(device).max(1)
         
             total += float(targets.size(0))
             correct += float(predicted.eq(targets).sum().item())
