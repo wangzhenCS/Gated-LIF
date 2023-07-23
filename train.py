@@ -82,91 +82,47 @@ def get_args():
 #                                                  #
 ####################################################
 def train(args, model, device, train_loader, optimizer, epoch, writer, criterion, scaler=None):
-    layer_cnt, gate_score_list = None, None
     t1 = time.time()
-    Top1, Top5 = 0.0, 0.0
+    
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device, dtype=torch.float), target.to(device, dtype=torch.long)
         optimizer.zero_grad()
-        if scaler is not None:
-            with amp.autocast():
-                output = model(data)
-                loss = criterion(output, target)
+        
+        output = model(data)
+        loss = criterion(output, target)
 
-        else:
-            output = model(data)
-            loss = criterion(output, target)
+        loss.backward()
+        optimizer.step()
 
-        if scaler is not None:
-            scaler.scale(loss).backward()
-            scaler.step(optimizer)
-            scaler.update()
-
-        else:
-            loss.backward()
-            optimizer.step()
-
-        prec1, prec5 = accuracy(output, target, topk=(1, 5))
-        Top1 += prec1.item() / 100
-        Top5 += prec5.item() / 100
-
-        if batch_idx % args.display_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tTop-1 = {:.6f}\tTop-5 = {:.6f}\tTime = {:.6f}'.format(
-                epoch, batch_idx * len(data / steps), len(train_loader.dataset),
-                       100. * batch_idx / len(train_loader), loss.item(),
-                Top1 / args.display_interval, Top5 / args.display_interval, time.time() - t1
-                    )
-                )
-            Top1, Top5 = 0.0, 0.0
-    print('time used in the epoch:{}'.format(time.time() - t1))
 
 def test(args, model, device, test_loader, epoch, writer, criterion, modeltag, dict_params, best= None):
-    objs = AvgrageMeter()
-    top1 = AvgrageMeter()
-    top5 = AvgrageMeter()
-    layer_cnt, gate_score_list = None, None
-    model.eval()# inactivate BN
-    t1 = time.time()
     with torch.no_grad():
-        for data, target in test_loader:
-            data, target = data.to(device, dtype=torch.float), target.to(device, dtype=torch.long)
-            output = model(data)
-            loss = criterion(output, target)
-            prec1, prec5 = accuracy(output, target, topk=(1, 5))
-            n = data.size(0)
-            objs.update(loss.item(), n)
-            top1.update(prec1.item(), n)
-            top5.update(prec5.item(), n)
+        acc = 0.
+        total = 0
+        correct = 0
+        for batch_idx, (inputs, targets) in enumerate(test_loader):
+            inputs = inputs.cuda()
+            outputs = F.softmax(model(inputs))
+        
+            #print(outputs)
+            #print(targets)
+        
+            # 组织预测获得的值
+            #pre[batch_idx*batch_size:(batch_idx+1)*batch_size] = outputs[:, :]
+        
+            labels = torch.zeros(batch_size, num_classes).scatter_(1, targets.view(-1, 1), 1)
+            # 组织真实标签值
+            #y_test[batch_idx*batch_size:(batch_idx+1)*batch_size] = labels[:, :]
+        
+            _, predicted = outputs.cpu().max(1)
+        
+            total += float(targets.size(0))
+            correct += float(predicted.eq(targets).sum().item())
+        
+        print('Testing acc:%.3f'%(100.*correct/total))
 
-        logInfo = 'TEST Epoch {}: loss = {:.6f},\t'.format(epoch, objs.avg) + \
-                  'Top-1  = {:.6f},\t'.format(top1.avg / 100) + \
-                  'Top-5  = {:.6f},\t'.format(top5.avg / 100) + \
-                  'val_time = {:.6f}\n'.format(time.time() - t1)
-        logging.info(logInfo)
-        writer.add_scalar('Top1_of_arch_{}'.format(0), top1.avg / 100, epoch)
-        writer.add_scalar('Top5_of_arch_{}'.format(0), top5.avg / 100, epoch)
-
-        record_param(args, model, dict=dict_params, epoch=epoch, modeltag=modeltag)
-        if best is not None:
-            if top1.avg / 100 > best['acc']:
-                best['acc'], best['epoch'] = top1.avg / 100, epoch
-                print('saving...')
-                save_checkpoint({
-                    'state_dict': model.state_dict(),
-                    }, epoch, tag=modeltag)#"./raw/models"
-
-            print('best acc is {} found in epoch {}'.format(best['acc'], best['epoch']))
-
-            if epoch % 20 == 0:
-                print('saving...')
-                save_checkpoint({
-                    'state_dict': model.state_dict(),
-                }, epoch, tag=modeltag)  # "./raw/models"
-        record_param(args, model, dict=dict_params, epoch=epoch, modeltag=modeltag, store=True)
-
-        writer.add_scalar('Test_Loss_/epoch', objs.avg, epoch)
-        writer.add_scalar('Test_Acc_/epoch', top1.avg / 100, epoch)
+        
 
 def seed_all(seed=1):
     random.seed(seed)
@@ -367,12 +323,11 @@ def main():
         train(args, model, device, train_loader, optimizer, epochs, writer, criterion=loss_function,
               scaler=scaler)
         if epochs % 5 == 0:
-            test(args, model, device, val_loader, epochs, writer, criterion=loss_function,
-                 modeltag=modeltag, best=best, dict_params=dict_params)
             torch.save(model, '/kaggle/working/model-'+str(epochs)+'.pt')
         else:
             pass
-        print('and lr now is {}'.format(scheduler.get_last_lr()))
+        test(args, model, device, val_loader, epochs, writer, criterion=loss_function,
+                 modeltag=modeltag, best=best, dict_params=dict_params)
         scheduler.step()
         epochs += 1
     writer.close()
