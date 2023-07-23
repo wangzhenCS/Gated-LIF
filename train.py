@@ -17,7 +17,7 @@ from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
 from torch.utils.data import SubsetRandomSampler
 import random
-import torch.nn
+import torch.nn as nn
 
 ####################################################
 # args                                             #
