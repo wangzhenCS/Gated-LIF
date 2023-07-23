@@ -213,9 +213,7 @@ def main():
         elif pname.split('.')[-1] in lifcal_param_name:
             lif_params.append(p)
             lif_cal_params.append(p)
-    # fetch id
-    params_id = list(map(id, lif_params))
-    other_params = list(filter(lambda p: id(p) not in params_id, all_params))
+    
     # optimizer & scheduler
     optimizer = torch.optim.SGD(model.parameters(),
                 lr=0.001,
@@ -223,7 +221,7 @@ def main():
                 weight_decay=0.0005
             )
     scheduler = CosineAnnealingLR_Multi_Params_soft(optimizer,
-                                                T_max=[50, 50, 50])
+                                                T_max=50)
     criterion = nn.CrossEntropyLoss()
 
     device = torch.device("cuda" if use_gpu else "cpu")
