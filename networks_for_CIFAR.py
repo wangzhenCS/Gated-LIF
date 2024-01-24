@@ -445,7 +445,7 @@ class ResNet_19_cifar(nn.Module):
         # building first layer
         input_channel = self.stage_out_channels[1]
         self.conv1 = nn.Sequential(
-            layer.SeqToANNContainer(nn.Conv2d(3, input_channel, kernel_size=3, stride=1, padding=1, bias=False),
+            layer.SeqToANNContainer(nn.Conv2d(1, input_channel, kernel_size=3, stride=1, padding=1, bias=False),
                                     tdBatchNorm(input_channel),
                                     ),
 
