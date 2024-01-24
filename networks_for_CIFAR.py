@@ -319,7 +319,7 @@ class ResNet_18_stand_CW(nn.Module):
                     nn.init.constant_(m.bias, 0)
 
 class ResNet_18_stand_CW_softsimple(nn.Module):
-    def __init__(self, lif_param:dict, input_size=32, n_class=100, tunable_lif=False):
+    def __init__(self, lif_param:dict, input_size=32, n_class=10, tunable_lif=False):
         super(ResNet_18_stand_CW_softsimple, self).__init__()
         assert input_size % 32 == 0
 
@@ -335,7 +335,7 @@ class ResNet_18_stand_CW_softsimple(nn.Module):
         # building first layer
         input_channel = self.stage_out_channels[1]
         self.conv1 = nn.Sequential(
-            layer.SeqToANNContainer(nn.Conv2d(3, input_channel, kernel_size=3, stride=1, padding=1, bias=False),
+            layer.SeqToANNContainer(nn.Conv2d(1, input_channel, kernel_size=3, stride=1, padding=1, bias=False),
                                     tdBatchNorm(input_channel),
                                     ),
 
