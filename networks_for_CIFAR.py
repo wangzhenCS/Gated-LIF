@@ -9,7 +9,7 @@ init_constrain = 0.2
 class CIFARNet(nn.Module):
     def __init__(self, lif_param: dict, input_size=32, n_class=10, tunable_lif=False):
         super(CIFARNet, self).__init__()
-        assert input_size % 32 == 0
+        assert input_size % 24 == 0
         self.choice_param_name = ['alpha', 'beta', 'gamma']
         self.lifcal_param_name = ['tau', 'Vth', 'leak', 'conduct', 'reVth']
         self.T = lif_param['t']
@@ -96,7 +96,7 @@ class CIFARNet(nn.Module):
 class ResNet_18_stand(nn.Module):
     def __init__(self, lif_param:dict,input_size=32, n_class=10, tunable_lif=False):
         super(ResNet_18_stand, self).__init__()
-        assert input_size % 32 == 0
+        assert input_size % 24 == 0
 
         self.choice_param_name = ['alpha', 'beta', 'gamma']
         self.lifcal_param_name = ['tau', 'Vth', 'leak', 'conduct', 'reVth']
@@ -203,7 +203,7 @@ class ResNet_18_stand(nn.Module):
 class ResNet_18_stand_CW(nn.Module):
     def __init__(self, lif_param:dict, input_size=32, n_class=10, tunable_lif=False):
         super(ResNet_18_stand_CW, self).__init__()
-        assert input_size % 32 == 0
+        assert input_size % 24 == 0
 
         self.choice_param_name = ['alpha', 'beta', 'gamma']
         self.lifcal_param_name = ['tau', 'Vth', 'leak', 'conduct', 'reVth']
@@ -321,7 +321,7 @@ class ResNet_18_stand_CW(nn.Module):
 class ResNet_18_stand_CW_softsimple(nn.Module):
     def __init__(self, lif_param:dict, input_size=32, n_class=10, tunable_lif=False):
         super(ResNet_18_stand_CW_softsimple, self).__init__()
-        assert input_size % 32 == 0
+        assert input_size % 24 == 0
 
         self.choice_param_name = ['alpha', 'beta', 'gamma']
         self.lifcal_param_name = ['tau', 'Vth', 'leak', 'conduct', 'reVth']
@@ -431,7 +431,7 @@ class ResNet_18_stand_CW_softsimple(nn.Module):
 class ResNet_19_cifar(nn.Module):
     def __init__(self, lif_param:dict, input_size=32, n_class=100, tunable_lif=False):
         super(ResNet_19_cifar, self).__init__()
-        assert input_size % 32 == 0
+        assert input_size % 24 == 0
 
         self.choice_param_name = ['alpha', 'beta', 'gamma']
         self.lifcal_param_name = ['tau', 'Vth', 'leak', 'conduct', 'reVth']
@@ -544,7 +544,7 @@ class ResNet_19_cifar(nn.Module):
 class ResNet_19_cifar_CW(nn.Module):
     def __init__(self, lif_param:dict, input_size=32, n_class=100, tunable_lif=False):
         super(ResNet_19_cifar_CW, self).__init__()
-        assert input_size % 32 == 0
+        assert input_size % 24 == 0
 
         self.choice_param_name = ['alpha', 'beta', 'gamma']
         self.lifcal_param_name = ['tau', 'Vth', 'leak', 'conduct', 'reVth']
@@ -661,7 +661,7 @@ class ResNet_19_cifar_CW(nn.Module):
 class ResNet_19_stand_CW_softsimple(nn.Module):
     def __init__(self, lif_param:dict, input_size=32, n_class=100, tunable_lif=False):
         super(ResNet_19_stand_CW_softsimple, self).__init__()
-        assert input_size % 32 == 0
+        assert input_size % 24 == 0
 
         self.choice_param_name = ['alpha', 'beta', 'gamma']
         self.lifcal_param_name = ['tau', 'Vth', 'leak', 'conduct', 'reVth']
