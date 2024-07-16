@@ -19,9 +19,9 @@ class CIFARNet(nn.Module):
         self.arch = [128, 256, "A", 512, "A", 1024, 512]
         self.features = self.make_layer(self.arch, batch_norm=True)
         self.classifier = layer.SeqToANNContainer(
-            nn.Linear(512 * 8 * 8, 1024, bias=False),
+            nn.Linear(512 * 6 * 6, 160, bias=False),
             # nn.Dropout(p=0.2),
-            nn.Linear(1024, 512, bias=False),
+            nn.Linear(160, 512, bias=False),
             nn.Linear(512, n_class, bias=False),
         )
 
